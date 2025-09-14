@@ -10,8 +10,14 @@ from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from collections import Counter
 
-LOG_DIR = Path("logs")
-LOG_DIR.mkdir(parents=True, exist_ok=True)
+LOG_DIR = Path(os.getenv("LOG_DIR", "/tmp/logs"))  # /tmp es escribible en deploy
+try:
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+except Exception as e:
+    # Si falla (muy raro), hacemos fallback a /tmp
+    LOG_DIR = Path("/tmp/logs")
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+
 LOG_FILE = LOG_DIR / "app.log"
 
 def setup_logger() -> logging.Logger:
@@ -223,3 +229,4 @@ if st.button("📌 Calcular GPA"):
             st.write("- Ofrecer recursos motivacionales y programas de apoyo.")
         else:
             st.info("Estudiante con desempeño adecuado. Mantener seguimiento motivacional.")
+
